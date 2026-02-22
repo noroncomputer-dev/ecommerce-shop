@@ -21,7 +21,7 @@ export default function LoginPage() {
 
     try {
       const userData = await login({ email, password });
-      await showLoginSuccess(userData?.name || "کاربر");
+      await showLoginSuccess((userData as any)?.name || "کاربر");
       router.push("/");
     } catch (err: any) {
       showError(err.response?.data?.message || "ایمیل یا رمز عبور اشتباه است");
