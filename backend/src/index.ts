@@ -19,23 +19,34 @@ import sliderRoutes from "./routes/sliderRoutes";
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ── Middleware ───────────────────────────────────────────
+// ✅ CORS — همه origin های Vercel رو قبول میکنه
 app.use(
   cors({
     origin: (origin, callback) => {
+      // اگه origin نداشت (مثل Postman) یا localhost بود قبول کن
+      if (!origin) return callback(null, true);
+
       const allowedOrigins = [
         "http://localhost:3000",
         process.env.FRONTEND_URL,
-      ].filter(Boolean);
-      if (!origin || allowedOrigins.includes(origin)) {
+      ].filter(Boolean) as string[];
+
+      // ✅ همه subdomain های Vercel رو قبول کن
+      const isVercel = origin.endsWith(".vercel.app");
+      const isAllowed = allowedOrigins.includes(origin);
+
+      if (isVercel || isAllowed) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
 app.use(express.json());
 
 // ── Routes ───────────────────────────────────────────────
@@ -51,7 +62,7 @@ app.use("/api/faq", faqRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/sliders", sliderRoutes);
-
+app.use(cors({ origin: "*", credentials: false }));
 // ── Health check ─────────────────────────────────────────
 app.get("/", (req, res) => {
   res.json({
