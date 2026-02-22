@@ -60,7 +60,7 @@ export default function NewProductPage() {
 
   // ✅ انتخاب فایل‌ها و ساختن پیش‌نمایش
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from((e.target.files as FileList) || []);
     if (files.length === 0) return;
 
     // اضافه کردن به فایل‌های قبلی

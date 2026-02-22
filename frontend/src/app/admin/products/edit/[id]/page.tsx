@@ -96,7 +96,7 @@ export default function EditProductPage() {
 
   // ✅ انتخاب فایل جدید
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from((e.target.files as FileList) || []);
     if (files.length === 0) return;
 
     setNewFiles((prev) => [...prev, ...files]);

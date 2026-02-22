@@ -179,7 +179,7 @@ export default function ProfilePage() {
         },
       });
       setProfile(updated);
-      updateUser(updated);
+      updateUser(updated as any);
       setEditing(false);
       showSuccess("پروفایل با موفقیت به‌روزرسانی شد");
     } catch (error: any) {
@@ -218,7 +218,7 @@ export default function ProfilePage() {
     try {
       const result = await userService.uploadAvatar(file);
       setProfile(result.user);
-      updateUser(result.user);
+      updateUser(result.user as any);
       showSuccess("آواتار با موفقیت آپلود شد");
     } catch (error: any) {
       showError(error.message || "خطا در آپلود آواتار");

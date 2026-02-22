@@ -288,7 +288,10 @@ export default function CategoriesPage() {
                   دسته‌بندی با مجموع{" "}
                   <span className="font-bold text-blue-600">
                     {Object.values(productCounts)
-                      .reduce((a, b) => a + b, 0)
+                      .reduce(
+                        (a: number, b: unknown) => a + (Number(b) || 0),
+                        0,
+                      )
                       .toLocaleString()}
                   </span>{" "}
                   محصول
