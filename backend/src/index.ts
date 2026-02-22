@@ -19,16 +19,14 @@ import sliderRoutes from "./routes/sliderRoutes";
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ Middleware
-app.use("/uploads", express.static("uploads"));
+// ── Middleware ───────────────────────────────────────────
 app.use(
   cors({
     origin: (origin, callback) => {
       const allowedOrigins = [
         "http://localhost:3000",
         process.env.FRONTEND_URL,
-      ].filter(Boolean); // ✅ حذف مقدارهای undefined
-
+      ].filter(Boolean);
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -40,7 +38,7 @@ app.use(
 );
 app.use(express.json());
 
-// ✅ مسیرهای API
+// ── Routes ───────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -54,41 +52,35 @@ app.use("/api/stats", statsRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/sliders", sliderRoutes);
 
-// ✅ اتصال به MongoDB Atlas
+// ── Health check ─────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.json({
+    message: "NoronTech Backend ✅",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ── MongoDB ──────────────────────────────────────────────
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/ecommerce";
 
 mongoose
   .connect(MONGODB_URI)
   .then(async () => {
-    console.log("✅ Connected to MongoDB Atlas");
-
-    // ✅ لود کردن مدل‌ها بعد از اتصال موفق
+    console.log("✅ Connected to MongoDB");
     await import("./models/Product");
     await import("./models/Category");
     await import("./models/User");
-    console.log("📦 Models loaded successfully");
   })
   .catch((err) => {
     console.error("❌ MongoDB Connection error:", err);
-    process.exit(1); // ❌ اگه وصل نشد، برنامه رو متوقف کن
+    process.exit(1);
   });
 
-// ✅ Route تست
-app.get("/", (req, res) => {
-  res.json({
-    message: "Backend is running....",
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// ✅ شروع سرور
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
-// ✅ مدیریت خطاهای unexpected
 process.on("unhandledRejection", (err) => {
   console.error("❌ Unhandled Rejection:", err);
   process.exit(1);

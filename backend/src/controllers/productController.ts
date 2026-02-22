@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { getErrorMessage } from "../utils/errorHandler";
 import Product from "../models/Product";
 import Category from "../models/Category";
+import { cloudinary } from "../config/cloudinary";
 
-const SERVER_URL = process.env.SERVER_URL || "http://localhost:5001";
-
-// ایجاد محصول جدید (فقط ادمین)
+// ── ایجاد محصول ─────────────────────────────────────────
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { name, description, price, category, stock, attributes } = req.body;
@@ -29,11 +27,10 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "");
 
+    // ✅ Cloudinary URL ها رو از multer میگیریم
     let imagePaths: string[] = [];
     if (files && files.length > 0) {
-      imagePaths = files.map(
-        (file) => `${SERVER_URL}/uploads/${file.filename}`,
-      );
+      imagePaths = files.map((file: any) => file.path); // Cloudinary URL
     }
 
     const product = await Product.create({
@@ -44,7 +41,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       category,
       images: imagePaths,
       stock: Number(stock) || 0,
-      attributes: attributes || {},
+      attributes: attributes ? JSON.parse(attributes) : {},
     });
 
     const populatedProduct = await Product.findById(product._id).populate(
@@ -60,7 +57,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// گرفتن همه محصولات
+// ── گرفتن همه محصولات ───────────────────────────────────
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const {
@@ -73,7 +70,6 @@ export const getProducts = async (req: Request, res: Response) => {
       sort,
     } = req.query;
 
-    // ✅ فیلتر
     const filter: any = {};
     if (category) filter.category = category;
     if (search) filter.name = { $regex: search, $options: "i" };
@@ -87,7 +83,6 @@ export const getProducts = async (req: Request, res: Response) => {
     const limitNum = Number(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    // ✅ تعداد کل و محصولات
     const total = await Product.countDocuments(filter);
     const products = await Product.find(filter)
       .populate("category", "name slug")
@@ -100,7 +95,7 @@ export const getProducts = async (req: Request, res: Response) => {
       pagination: {
         page: pageNum,
         limit: limitNum,
-        total, // ✅ تعداد واقعی
+        total,
         pages: Math.ceil(total / limitNum),
       },
     });
@@ -109,29 +104,26 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 };
 
-// گرفتن محصول با slug
+// ── گرفتن محصول با slug ──────────────────────────────────
 export const getProductBySlug = async (req: Request, res: Response) => {
   try {
     const product = await Product.findOne({ slug: req.params.slug }).populate(
       "category",
       "name slug",
     );
-    if (!product) {
-      return res.status(404).json({ message: "محصول یافت نشد" });
-    }
+    if (!product) return res.status(404).json({ message: "محصول یافت نشد" });
     res.json(product);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// گرفتن محصولات بر اساس دسته‌بندی
+// ── گرفتن محصولات بر اساس دسته‌بندی ────────────────────
 export const getProductByCategory = async (req: Request, res: Response) => {
   try {
     const category = await Category.findOne({ slug: req.params.slug });
-    if (!category) {
+    if (!category)
       return res.status(404).json({ message: "دسته‌بندی یافت نشد" });
-    }
 
     const products = await Product.find({ category: category._id }).populate(
       "category",
@@ -143,28 +135,27 @@ export const getProductByCategory = async (req: Request, res: Response) => {
   }
 };
 
-// گرفتن محصول با ID
+// ── گرفتن محصول با ID ───────────────────────────────────
 export const getProductById = async (req: AuthRequest, res: Response) => {
   try {
     const product = await Product.findById(req.params.id).populate(
       "category",
       "name slug",
     );
-    if (!product) {
-      return res.status(404).json({ message: "محصول یافت نشد" });
-    }
+    if (!product) return res.status(404).json({ message: "محصول یافت نشد" });
     res.json(product);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// ویرایش محصول
+// ── ویرایش محصول ────────────────────────────────────────
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
     const files = req.files as Express.Multer.File[];
     const { name, description, price, category, stock, attributes } = req.body;
 
+    // تصاویر موجود که کاربر نگه داشته
     let existingImages: string[] = [];
     if (req.body.existingImages) {
       existingImages = Array.isArray(req.body.existingImages)
@@ -172,11 +163,10 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
         : [req.body.existingImages];
     }
 
+    // ✅ تصاویر جدید از Cloudinary
     let newImagePaths: string[] = [];
     if (files && files.length > 0) {
-      newImagePaths = files.map(
-        (file) => `${SERVER_URL}/uploads/${file.filename}`,
-      );
+      newImagePaths = files.map((file: any) => file.path);
     }
 
     const finalImages = [...existingImages, ...newImagePaths];
@@ -187,7 +177,9 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
     if (price) updates.price = Number(price);
     if (category) updates.category = category;
     if (stock !== undefined) updates.stock = Number(stock);
-    if (attributes) updates.attributes = attributes;
+    if (attributes)
+      updates.attributes =
+        typeof attributes === "string" ? JSON.parse(attributes) : attributes;
     if (finalImages.length > 0) updates.images = finalImages;
 
     const product = await Product.findByIdAndUpdate(
@@ -196,23 +188,27 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       { new: true, runValidators: true },
     ).populate("category");
 
-    if (!product) {
-      return res.status(404).json({ message: "محصول یافت نشد" });
-    }
-
+    if (!product) return res.status(404).json({ message: "محصول یافت نشد" });
     res.json(product);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// حذف محصول
+// ── حذف محصول ───────────────────────────────────────────
 export const deleteProduct = async (req: AuthRequest, res: Response) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: "محصول یافت نشد" });
+    if (!product) return res.status(404).json({ message: "محصول یافت نشد" });
+
+    // ✅ حذف تصاویر از Cloudinary
+    for (const imageUrl of product.images) {
+      try {
+        const publicId = imageUrl.split("/").slice(-2).join("/").split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      } catch (e) {}
     }
+
     await product.deleteOne();
     res.json({ message: "محصول با موفقیت حذف شد" });
   } catch (error: any) {
