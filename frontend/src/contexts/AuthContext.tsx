@@ -9,8 +9,8 @@ import authService, {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (data: LoginData) => Promise<User>; // ✅ void → User
-  register: (data: RegisterData) => Promise<void>;
+  login: (data: LoginData) => Promise<User>; // ✅ fix
+  register: (data: RegisterData) => Promise<User>; // ✅ fix
   logout: () => void;
   updateUser: (updatedUser: User) => void;
   isAuthenticated: boolean;
@@ -51,10 +51,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (data: RegisterData): Promise<void> => {
+  const register = async (data: RegisterData): Promise<User> => {
+    // ✅ fix
     try {
       const userData = await authService.register(data);
       setUser(userData);
+      return userData; // ✅ fix
     } catch (error) {
       console.error("Register error:", error);
       throw error;

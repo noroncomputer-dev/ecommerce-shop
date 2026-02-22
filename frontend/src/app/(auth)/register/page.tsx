@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuth } from "../../../../src/contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext"; // ✅ مسیر اشتباه fix شد
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { showError, showSuccess, showLoginSuccess } from "../../../utils/swal";
@@ -11,23 +11,19 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // ✅ حذف error state اضافه
 
   const { register } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
-    // اعتبارسنجی تطابق رمزها
     if (password !== confirmPassword) {
       showError("رمز عبور و تکرار آن مطابقت ندارند");
       return;
     }
 
-    // اعتبارسنجی حداقل طول رمز
     if (password.length < 6) {
       showError("رمز عبور باید حداقل ۶ کاراکتر باشد");
       return;
@@ -38,7 +34,7 @@ export default function RegisterPage() {
     try {
       const userData = await register({ name, email, password });
       await showSuccess("ثبت‌نام با موفقیت انجام شد!");
-      await showLoginSuccess(userData?.name||"کاربر");
+      await showLoginSuccess(userData?.name || "کاربر");
       router.push("/");
     } catch (err: any) {
       showError(err.response?.data?.message || "خطا در ثبت‌نام");
@@ -48,7 +44,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen  flex justify-center items-start bg-gray-50 py-12 px-4 sm:px-6 lg:px-10 ">
+    <div className="min-h-screen flex justify-center items-start bg-gray-50 py-12 px-4 sm:px-6 lg:px-10">
       <div className="max-w-md w-full space-y-8 bg-gray-300 shadow-lg rounded-md py-12 px-12 mt-20 mx-auto">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           ثبت نام در فروشگاه
@@ -56,12 +52,6 @@ export default function RegisterPage() {
         <p className="mt-2 text-center text-sm text-gray-600">
           با ثبت‌ نام می‌تونی از تمام امکانات فروشگاه استفاده کنی
         </p>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red700 px-4 py-3 rounded-lg text-center">
-            {error}
-          </div>
-        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -79,10 +69,10 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="text"
-                
                 placeholder="علی رضایی"
               />
             </div>
+
             <div>
               <label
                 htmlFor="email"
@@ -102,6 +92,7 @@ export default function RegisterPage() {
                 dir="ltr"
               />
             </div>
+
             <div>
               <label
                 htmlFor="password"
@@ -121,6 +112,7 @@ export default function RegisterPage() {
                 dir="ltr"
               />
             </div>
+
             <div>
               <label
                 htmlFor="confirmPassword"
@@ -140,21 +132,18 @@ export default function RegisterPage() {
                 dir="ltr"
               />
             </div>
+
             <div>
               <button
                 disabled={loading}
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border
-               border-transparent text-sm font-medium rounded-lg text-white
-               bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 
-               focus:ring-offset-2focus:ring-blue-500 disabled:opacity-50 
-               disabled:cursor-not-allowed transition-colors"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" // ✅ CSS typo fix شد
               >
-                {" "}
                 {loading ? "در حال ثبت‌نام..." : "ثبت‌ نام"}
               </button>
             </div>
           </div>
+
           <div className="text-center">
             <Link
               href="/login"
