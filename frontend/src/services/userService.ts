@@ -16,14 +16,15 @@ export interface UserProfile {
   createdAt: string;
 }
 
+// ✅ alias اضافه شد تا import { User } کار کنه
+export type User = UserProfile;
+
 class UserService {
-  // دریافت پروفایل کاربر جاری
   async getProfile(): Promise<UserProfile> {
     const response = await api.get("/users/profile");
     return response.data;
   }
 
-  // ویرایش پروفایل
   async updateProfile(data: {
     name?: string;
     profile?: {
@@ -38,7 +39,6 @@ class UserService {
     return response.data;
   }
 
-  // تغییر رمز عبور
   async changePassword(data: {
     currentPassword: string;
     newPassword: string;
@@ -47,7 +47,6 @@ class UserService {
     return response.data;
   }
 
-  // آپلود آواتار
   async uploadAvatar(
     file: File,
   ): Promise<{ avatar: string; user: UserProfile }> {
@@ -62,7 +61,6 @@ class UserService {
     return response.data;
   }
 
-  // =============== متدهای قبلی ===============
   async getAllUsers(): Promise<UserProfile[]> {
     const response = await api.get("/users");
     return response.data;

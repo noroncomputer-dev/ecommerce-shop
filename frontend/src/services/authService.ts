@@ -16,7 +16,7 @@ export interface User {
   name: string;
   email: string;
   role: "user" | "admin";
-  token: string;
+  token?: string; // ✅ optional شد تا با UserProfile سازگار باشه
 }
 
 class AuthService {
