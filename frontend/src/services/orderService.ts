@@ -23,7 +23,13 @@ export interface Order {
   user: string;
   items: OrderItem[];
   totalAmount: number;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  status:
+    | "pending"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded"; // ✅ refunded اضافه شد
   shippingAddress: ShippingAddress;
   paymentMethod: string;
   paymentStatus: "pending" | "paid" | "failed";
@@ -31,7 +37,6 @@ export interface Order {
 }
 
 class OrderServiceFetch {
-  // تابع کمکی برای اضافه کردن توکن به هدر
   private getHeaders() {
     const token = localStorage.getItem("token");
     return {
@@ -40,7 +45,6 @@ class OrderServiceFetch {
     };
   }
 
-  // ✅ ایجاد سفارش جدید
   async createOrder(data: any): Promise<Order> {
     const response = await fetch(`${API_BASE_URL}/orders`, {
       method: "POST",
@@ -56,7 +60,6 @@ class OrderServiceFetch {
     return response.json();
   }
 
-  // ✅ دریافت سفارش‌های کاربر جاری
   async getMyOrders(): Promise<Order[]> {
     const response = await fetch(`${API_BASE_URL}/orders/my-orders`, {
       headers: this.getHeaders(),
@@ -69,7 +72,6 @@ class OrderServiceFetch {
     return response.json();
   }
 
-  // ✅ دریافت یک سفارش با ID — URL اصلاح شد
   async getOrderById(id: string): Promise<Order> {
     const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
       headers: this.getHeaders(),
@@ -82,7 +84,6 @@ class OrderServiceFetch {
     return response.json();
   }
 
-  // ✅ دریافت همه سفارش‌ها (فقط ادمین)
   async getAllOrders(): Promise<Order[]> {
     const response = await fetch(`${API_BASE_URL}/orders/all`, {
       headers: this.getHeaders(),
@@ -95,7 +96,6 @@ class OrderServiceFetch {
     return response.json();
   }
 
-  // ✅ آپدیت وضعیت سفارش (فقط ادمین)
   async updateOrderStatus(id: string, status: Order["status"]): Promise<Order> {
     const response = await fetch(`${API_BASE_URL}/orders/${id}/status`, {
       method: "PUT",
