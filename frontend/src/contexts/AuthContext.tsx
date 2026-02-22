@@ -9,10 +9,10 @@ import authService, {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (data: LoginData) => Promise<void>;
+  login: (data: LoginData) => Promise<User>; // ✅ void → User
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
-  updateUser: (updatedUser: User) => void; // ✅ اضافه شد
+  updateUser: (updatedUser: User) => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
@@ -40,8 +40,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loadUser();
   }, []);
 
-  const isAdmin = user?.role === "admin";
-
   const login = async (data: LoginData): Promise<User> => {
     try {
       const userData = await authService.login(data);
@@ -53,11 +51,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterData): Promise<void> => {
     try {
       const userData = await authService.register(data);
       setUser(userData);
-      return userData;
     } catch (error) {
       console.error("Register error:", error);
       throw error;
@@ -69,7 +66,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
-  // ✅ آپدیت user در state و localStorage
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
     const token = localStorage.getItem("token");
@@ -82,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     login,
     register,
     logout,
-    updateUser, // ✅
+    updateUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === "admin",
   };

@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { showError, showLoginSuccess, showSuccess } from "../../../utils/swal";
+import { showError, showLoginSuccess } from "../../../utils/swal";
 import { useAuth } from "../../../contexts/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
@@ -21,7 +20,7 @@ export default function LoginPage() {
 
     try {
       const userData = await login({ email, password });
-      await showLoginSuccess((userData as any)?.name || "کاربر");
+      await showLoginSuccess(userData?.name || "کاربر");
       router.push("/");
     } catch (err: any) {
       showError(err.response?.data?.message || "ایمیل یا رمز عبور اشتباه است");
@@ -31,7 +30,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen  flex justify-center items-start bg-gray-50 py-12 px-4 sm:px-6 lg:px-10 ">
+    <div className="min-h-screen flex justify-center items-start bg-gray-50 py-12 px-4 sm:px-6 lg:px-10">
       <div className="max-w-md w-full space-y-8 bg-gray-300 shadow-lg rounded-md py-12 px-12 mt-20 mx-auto">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -43,18 +42,12 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
-            {error}
-          </div>
-        )}
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1 "
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 ایمیل
               </label>
@@ -105,7 +98,7 @@ export default function LoginPage() {
           <div className="text-center">
             <Link
               href="/register"
-              className="text-sm  text-blue-600 hover:text-blue-500 transition-colors"
+              className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
             >
               حساب کاربری ندارید؟ ثبت‌نام کنید
             </Link>
