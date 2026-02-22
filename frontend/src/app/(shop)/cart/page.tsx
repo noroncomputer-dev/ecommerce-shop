@@ -30,7 +30,7 @@ import {
 import { showError, showSuccess, showWarning } from "@/utils/swal";
 import orderService from "@/services/orderService";
 
-const API_BASE = "http://localhost:5001/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 function getHeaders() {
   const token = localStorage.getItem("token");
@@ -131,7 +131,7 @@ export default function CartPage() {
       const order = await orderService.createOrder(orderData);
 
       // ۲. درخواست پرداخت از زرین‌پال
-      const payRes = await fetch(`${API_BASE}/payment/request`, {
+      const payRes = await fetch(`${API_BASE_URL}/payment/request`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({ orderId: order._id }),

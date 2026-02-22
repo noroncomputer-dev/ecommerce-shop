@@ -1,6 +1,7 @@
 import api from "./api";
 
-const API_BASE_URL = "http://localhost:5001/api";
+// ✅ از environment variable استفاده میکنه — نه localhost
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 export interface OrderItem {
   productId: string;
@@ -23,13 +24,7 @@ export interface Order {
   user: string;
   items: OrderItem[];
   totalAmount: number;
-  status:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded"; // ✅ refunded اضافه شد
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
   shippingAddress: ShippingAddress;
   paymentMethod: string;
   paymentStatus: "pending" | "paid" | "failed";
@@ -51,12 +46,10 @@ class OrderServiceFetch {
       headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
-
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || `HTTP error ${response.status}`);
     }
-
     return response.json();
   }
 
@@ -64,11 +57,7 @@ class OrderServiceFetch {
     const response = await fetch(`${API_BASE_URL}/orders/my-orders`, {
       headers: this.getHeaders(),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
     return response.json();
   }
 
@@ -76,11 +65,7 @@ class OrderServiceFetch {
     const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
       headers: this.getHeaders(),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
     return response.json();
   }
 
@@ -88,11 +73,7 @@ class OrderServiceFetch {
     const response = await fetch(`${API_BASE_URL}/orders/all`, {
       headers: this.getHeaders(),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
     return response.json();
   }
 
@@ -102,11 +83,7 @@ class OrderServiceFetch {
       headers: this.getHeaders(),
       body: JSON.stringify({ status }),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
     return response.json();
   }
 }
