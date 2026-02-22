@@ -1,8 +1,9 @@
 "use client";
-import { useEffect } from "react";
+
+import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function PaymentVerifyPage() {
+function PaymentVerifyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -30,5 +31,26 @@ export default function PaymentVerifyPage() {
     >
       <p>⏳ در حال تأیید پرداخت، لطفاً صبر کنید...</p>
     </div>
+  );
+}
+
+export default function PaymentVerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <p>⏳ در حال تأیید پرداخت، لطفاً صبر کنید...</p>
+        </div>
+      }
+    >
+      <PaymentVerifyContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ interface ProductFiltersProps {
   onClose?: () => void;
 }
 
-export default function ProductFilters({
+function ProductFiltersContent({
   categories,
   minPrice,
   maxPrice,
@@ -49,14 +49,12 @@ export default function ProductFilters({
   );
 
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || "",
   );
 
   const applyFilters = () => {
     const params = new URLSearchParams();
-
     if (searchTerm) params.set("search", searchTerm);
     if (selectedCategories.length)
       params.set("category", selectedCategories.join(","));
@@ -65,7 +63,6 @@ export default function ProductFilters({
     if (priceRange[1] < maxPrice)
       params.set("maxPrice", priceRange[1].toString());
     if (sortBy !== "newest") params.set("sort", sortBy);
-
     router.push(`/products?${params.toString()}`);
     onClose?.();
   };
@@ -89,7 +86,6 @@ export default function ProductFilters({
 
   return (
     <div className="space-y-6">
-      {/* جستجو */}
       <div className="relative">
         <Input
           placeholder="جستجوی محصولات..."
@@ -101,7 +97,6 @@ export default function ProductFilters({
       </div>
 
       <Accordion type="multiple" defaultValue={["categories", "price", "sort"]}>
-        {/* دسته‌بندی‌ها */}
         <AccordionItem value="categories">
           <AccordionTrigger className="text-lg font-bold">
             دسته‌بندی‌ها
@@ -137,7 +132,6 @@ export default function ProductFilters({
           </AccordionContent>
         </AccordionItem>
 
-        {/* محدوده قیمت */}
         <AccordionItem value="price">
           <AccordionTrigger className="text-lg font-bold">
             محدوده قیمت
@@ -184,7 +178,6 @@ export default function ProductFilters({
           </AccordionContent>
         </AccordionItem>
 
-        {/* مرتب‌سازی */}
         <AccordionItem value="sort">
           <AccordionTrigger className="text-lg font-bold">
             مرتب‌سازی
@@ -216,7 +209,6 @@ export default function ProductFilters({
         </AccordionItem>
       </Accordion>
 
-      {/* دکمه‌ها */}
       <div className="flex gap-3 pt-4">
         <Button
           onClick={applyFilters}
@@ -231,5 +223,20 @@ export default function ProductFilters({
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function ProductFilters(props: ProductFiltersProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="animate-pulse space-y-4">
+          <div className="h-10 bg-gray-200 rounded" />
+          <div className="h-40 bg-gray-200 rounded" />
+        </div>
+      }
+    >
+      <ProductFiltersContent {...props} />
+    </Suspense>
   );
 }
