@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Search, X, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import productService, { Product } from "@/services/productService";
@@ -37,7 +37,6 @@ function Pagination({
 
   return (
     <div className="flex items-center justify-center gap-2 mt-10">
-      {/* دکمه قبلی */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -47,7 +46,6 @@ function Pagination({
         قبلی
       </button>
 
-      {/* ✅ همه شماره صفحات */}
       <div className="flex items-center gap-1">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <button
@@ -64,7 +62,6 @@ function Pagination({
         ))}
       </div>
 
-      {/* دکمه بعدی */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -77,10 +74,10 @@ function Pagination({
   );
 }
 
-// ─── صفحه اصلی محصولات ───
+// ─── کامپوننت اصلی با useSearchParams ───
 const ITEMS_PER_PAGE = 12;
 
-export default function ProductsPage() {
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -98,7 +95,6 @@ export default function ProductsPage() {
     loadData();
   }, []);
 
-  // reset به صفحه اول وقتی فیلتر تغییر کرد
   useEffect(() => {
     setCurrentPage(1);
   }, [search, selectedCategory, sortBy]);
@@ -132,7 +128,6 @@ export default function ProductsPage() {
     router.push("/products");
   };
 
-  // فیلتر و مرتب‌سازی
   const filtered = useMemo(() => {
     let result = [...products];
 
@@ -170,7 +165,6 @@ export default function ProductsPage() {
     return result;
   }, [products, search, selectedCategory, sortBy]);
 
-  // ✅ pagination
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginatedProducts = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -190,7 +184,6 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-black bg-gradient-to-l from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
             محصولات
@@ -204,7 +197,6 @@ export default function ProductsPage() {
           )}
         </div>
 
-        {/* Search + Sort */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -260,7 +252,6 @@ export default function ProductsPage() {
           </Button>
         </div>
 
-        {/* Desktop Filters */}
         <div className="hidden sm:flex items-center gap-3 mb-6 flex-wrap">
           <Button
             variant={selectedCategory === "all" ? "default" : "outline"}
@@ -291,7 +282,6 @@ export default function ProductsPage() {
           )}
         </div>
 
-        {/* Mobile Filter Sheet */}
         <Sheet open={showMobileFilters} onOpenChange={setShowMobileFilters}>
           <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl">
             <SheetHeader>
@@ -362,7 +352,6 @@ export default function ProductsPage() {
           </SheetContent>
         </Sheet>
 
-        {/* Products Grid */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {[...Array(8)].map((_, i) => (
@@ -393,7 +382,6 @@ export default function ProductsPage() {
           </div>
         ) : (
           <>
-            {/* ✅ اطلاعات صفحه */}
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 نمایش {(currentPage - 1) * ITEMS_PER_PAGE + 1} تا{" "}
@@ -405,14 +393,12 @@ export default function ProductsPage() {
               </p>
             </div>
 
-            {/* Grid محصولات */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {paginatedProducts.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
             </div>
 
-            {/* ✅ Pagination */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -422,5 +408,23 @@ export default function ProductsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// ─── ✅ export default با Suspense ───
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4" />
+            <p className="text-gray-500">در حال بارگذاری...</p>
+          </div>
+        </div>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }
