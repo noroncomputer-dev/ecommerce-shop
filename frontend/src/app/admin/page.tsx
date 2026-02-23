@@ -14,7 +14,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-const API = "http://localhost:5001/api";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api"; // ✅
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
