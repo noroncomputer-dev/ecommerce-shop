@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
 import Slider from "../models/Slider";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { v2 as cloudinary } from "cloudinary";
+
+// ✅ تنظیم Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // دریافت اسلایدرهای فعال
 export const getActiveSliders = async (req: Request, res: Response) => {
@@ -8,7 +16,6 @@ export const getActiveSliders = async (req: Request, res: Response) => {
     const sliders = await Slider.find({ isActive: true })
       .sort({ order: 1 })
       .limit(5);
-
     res.json(sliders);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -103,16 +110,26 @@ export const toggleSliderStatus = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// =============== آپلود تصویر اسلایدر ===============
+// ✅ آپلود تصویر به Cloudinary
 export const uploadSliderImage = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "لطفاً یک تصویر انتخاب کنید" });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // آپلود به Cloudinary از buffer
+    const result = await new Promise<any>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "sliders" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        },
+      );
+      stream.end(req.file!.buffer);
+    });
 
-    res.json({ url: imageUrl });
+    res.json({ url: result.secure_url });
   } catch (error: any) {
     console.error("Error in uploadSliderImage:", error);
     res.status(500).json({ message: error.message });
