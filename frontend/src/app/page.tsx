@@ -8,6 +8,8 @@ import Features from "@/components/layout/Features";
 import SpecialOffer from "@/components/layout/SpecialOffer";
 import { ProductGrid } from "@/components/layout/ProductGrid";
 import Categories from "@/components/layout/Categories";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 
 // ✅ از env variable استفاده میکنه
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
@@ -35,19 +37,23 @@ export default function HomePage() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-6">
-      <HeroSlider />
-      <Categories />
-      <Features />
-      <SpecialOffer />
-      <DiscountBanner />
-      <ProductGrid
-        title="محصولات ویژه"
-        viewAllLink="/products"
-        products={products}
-        loading={loading}
-      />
-      <FooterCTA />
-    </main>
+    <>
+      <Navbar />
+      <main className="container mx-auto px-4 py-6">
+        <HeroSlider />
+        <Categories />
+        <Features />
+        <SpecialOffer />
+        <DiscountBanner />
+        <ProductGrid
+          title="محصولات ویژه"
+          viewAllLink="/products"
+          products={products}
+          loading={loading}
+        />
+        <FooterCTA />
+      </main>
+      <Footer />
+    </>
   );
 }

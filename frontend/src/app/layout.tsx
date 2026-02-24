@@ -34,9 +34,7 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               <div className="min-h-full flex flex-col">
-                <Navbar />
                 {children}
-                <Footer />
               </div>
             </CartProvider>
           </AuthProvider>
