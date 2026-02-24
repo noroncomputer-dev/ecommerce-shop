@@ -305,15 +305,11 @@ export default function AdminLayout({
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>حساب کاربری</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => router.push("/admin/profile")}
-                  >
+                  <DropdownMenuItem onClick={() => router.push("/profile")}>
                     <Users className="h-4 w-4 ml-2" />
                     پروفایل
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => router.push("/admin/settings")}
-                  >
+                  <DropdownMenuItem onClick={() => router.push("/settings")}>
                     <Settings className="h-4 w-4 ml-2" />
                     تنظیمات
                   </DropdownMenuItem>
