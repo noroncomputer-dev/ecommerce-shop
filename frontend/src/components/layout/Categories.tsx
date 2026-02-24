@@ -49,41 +49,59 @@ export default function CategoriesSection() {
     }
   };
 
-  // رنگ پس‌زمینه کارت‌ها
+  // رنگ‌های بهینه‌شده برای دارک/لایت مود
   const cardStyles = [
     {
-      bg: "bg-slate-800",
+      bg: "bg-white dark:bg-slate-800",
+      border: "border-blue-100 dark:border-blue-900",
       accent: "from-blue-500 to-cyan-400",
-      text: "text-blue-400",
+      text: "text-blue-600 dark:text-blue-400",
+      shadow: "shadow-blue-100/50 dark:shadow-blue-900/30",
+      hover: "hover:shadow-blue-200/50 dark:hover:shadow-blue-800/30",
     },
     {
-      bg: "bg-gray-800",
+      bg: "bg-white dark:bg-gray-800",
+      border: "border-purple-100 dark:border-purple-900",
       accent: "from-purple-500 to-pink-400",
-      text: "text-purple-400",
+      text: "text-purple-600 dark:text-purple-400",
+      shadow: "shadow-purple-100/50 dark:shadow-purple-900/30",
+      hover: "hover:shadow-purple-200/50 dark:hover:shadow-purple-800/30",
     },
     {
-      bg: "bg-zinc-800",
+      bg: "bg-white dark:bg-zinc-800",
+      border: "border-green-100 dark:border-green-900",
       accent: "from-green-500 to-emerald-400",
-      text: "text-green-400",
+      text: "text-green-600 dark:text-green-400",
+      shadow: "shadow-green-100/50 dark:shadow-green-900/30",
+      hover: "hover:shadow-green-200/50 dark:hover:shadow-green-800/30",
     },
     {
-      bg: "bg-neutral-800",
+      bg: "bg-white dark:bg-neutral-800",
+      border: "border-orange-100 dark:border-orange-900",
       accent: "from-orange-500 to-amber-400",
-      text: "text-orange-400",
+      text: "text-orange-600 dark:text-orange-400",
+      shadow: "shadow-orange-100/50 dark:shadow-orange-900/30",
+      hover: "hover:shadow-orange-200/50 dark:hover:shadow-orange-800/30",
     },
     {
-      bg: "bg-stone-800",
+      bg: "bg-white dark:bg-stone-800",
+      border: "border-rose-100 dark:border-rose-900",
       accent: "from-rose-500 to-red-400",
-      text: "text-rose-400",
+      text: "text-rose-600 dark:text-rose-400",
+      shadow: "shadow-rose-100/50 dark:shadow-rose-900/30",
+      hover: "hover:shadow-rose-200/50 dark:hover:shadow-rose-800/30",
     },
     {
-      bg: "bg-slate-900",
+      bg: "bg-white dark:bg-slate-900",
+      border: "border-indigo-100 dark:border-indigo-900",
       accent: "from-indigo-500 to-violet-400",
-      text: "text-indigo-400",
+      text: "text-indigo-600 dark:text-indigo-400",
+      shadow: "shadow-indigo-100/50 dark:shadow-indigo-900/30",
+      hover: "hover:shadow-indigo-200/50 dark:hover:shadow-indigo-800/30",
     },
   ];
 
-  // fallback emoji
+  // fallback emoji (بدون تغییر)
   const getFallbackIcon = (name: string) => {
     const icons: Record<string, string> = {
       ماوس: "🖱️",
@@ -108,13 +126,17 @@ export default function CategoriesSection() {
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <Skeleton className="h-8 w-48 mb-2" />
-            <Skeleton className="h-4 w-64" />
+            <Skeleton className="h-8 w-48 mb-2 bg-gray-200 dark:bg-gray-700" />
+            <Skeleton className="h-4 w-64 bg-gray-200 dark:bg-gray-700" />
           </div>
+          <Skeleton className="h-10 w-28 bg-gray-200 dark:bg-gray-700" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-2xl" />
+            <Skeleton
+              key={i}
+              className="h-32 rounded-2xl bg-gray-200 dark:bg-gray-700"
+            />
           ))}
         </div>
       </section>
@@ -124,11 +146,11 @@ export default function CategoriesSection() {
   if (categories.length === 0) return null;
 
   return (
-    <section className="py-16 px-4 max-w-7xl mx-auto">
-      {/* Header */}
+    <section className="py-16 px-4 max-w-7xl mx-auto transition-colors duration-300">
+      {/* Header - بهینه شده برای دارک/لایت */}
       <div className="flex items-end justify-between mb-10">
         <div>
-          <p className="text-blue-500 text-sm font-semibold tracking-widest uppercase mb-2">
+          <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold tracking-widest uppercase mb-2">
             دسته‌بندی‌ها
           </p>
           <h2 className="text-3xl font-black text-gray-900 dark:text-white">
@@ -141,7 +163,7 @@ export default function CategoriesSection() {
         <Link href="/categories">
           <Button
             variant="ghost"
-            className="gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700"
+            className="gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30"
           >
             مشاهده همه
             <ChevronLeft className="h-4 w-4" />
@@ -149,7 +171,7 @@ export default function CategoriesSection() {
         </Link>
       </div>
 
-      {/* کارت‌های افقی */}
+      {/* کارت‌های افقی - با پشتیبانی کامل از دارک/لایت */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.slice(0, 6).map((category, index) => {
           const style = cardStyles[index % cardStyles.length];
@@ -162,11 +184,11 @@ export default function CategoriesSection() {
               className="group"
             >
               <div
-                className={`relative flex items-center gap-4 p-5 rounded-2xl ${style.bg} overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer border border-white/5`}
+                className={`relative flex items-center gap-4 p-5 rounded-2xl ${style.bg} border ${style.border} overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${style.shadow} ${style.hover} cursor-pointer`}
               >
-                {/* گرادیان پس‌زمینه */}
+                {/* گرادیان پس‌زمینه - در هاور برای هر دو تم */}
                 <div
-                  className={`absolute inset-0 bg-gradient-to-l ${style.accent} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                  className={`absolute inset-0 bg-gradient-to-l ${style.accent} opacity-0 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-300`}
                 />
 
                 {/* خط رنگی سمت راست */}
@@ -174,8 +196,8 @@ export default function CategoriesSection() {
                   className={`absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b ${style.accent} rounded-r-2xl`}
                 />
 
-                {/* تصویر / آیکون */}
-                <div className="relative shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center">
+                {/* تصویر / آیکون - بهینه شده */}
+                <div className="relative shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border border-gray-200 dark:border-white/5">
                   {hasImage ? (
                     <img
                       src={category.image}
@@ -191,16 +213,16 @@ export default function CategoriesSection() {
 
                 {/* متن */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-white text-lg mb-1 line-clamp-1">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1 line-clamp-1">
                     {category.name}
                   </h3>
-                  <p className={`text-sm ${style.text}`}>
+                  <p className={`text-sm ${style.text} font-medium`}>
                     {productCounts[category._id] || 0} محصول
                   </p>
                 </div>
 
-                {/* آیکون فلش */}
-                <ArrowLeft className="h-5 w-5 text-white/30 group-hover:text-white/80 group-hover:-translate-x-1 transition-all duration-300 shrink-0" />
+                {/* آیکون فلش - بهینه شده */}
+                <ArrowLeft className="h-5 w-5 text-gray-400 dark:text-white/30 group-hover:text-blue-600 dark:group-hover:text-white/80 group-hover:-translate-x-1 transition-all duration-300 shrink-0" />
               </div>
             </Link>
           );
