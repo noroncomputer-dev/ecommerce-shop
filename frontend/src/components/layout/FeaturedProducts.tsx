@@ -4,10 +4,11 @@ import Link from "next/link";
 import { ChevronLeft, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
+// ✅ بدون localhost
 const getImageUrl = (path: string) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  return `http://localhost:5001${path}`;
+  return `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}${path}`;
 };
 
 interface Props {
@@ -22,12 +23,12 @@ export default function FeaturedProducts({ products, loading }: Props) {
     <section className="max-w-7xl mx-auto px-4 pb-16">
       <div className="flex items-center justify-between mb-8">
         <div>
+          <p className="text-blue-500 text-sm font-semibold tracking-widest uppercase mb-1">
+            پیشنهاد ما
+          </p>
           <h2 className="text-2xl font-black text-gray-900 dark:text-white">
             محصولات ویژه
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            بهترین‌های NoronTech برای شما
-          </p>
         </div>
         <Link
           href="/products"
@@ -47,7 +48,10 @@ export default function FeaturedProducts({ products, loading }: Props) {
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">محصولی یافت نشد</div>
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-5xl mb-4">📦</p>
+          <p>محصولی یافت نشد</p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {products.map((product) => (
@@ -61,7 +65,7 @@ export default function FeaturedProducts({ products, loading }: Props) {
               >
                 {product.images?.[0] ? (
                   <img
-                    src={getImageUrl(product.images[0])}
+                    src={product.images[0]}
                     alt={product.name}
                     className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500"
                   />
@@ -71,6 +75,7 @@ export default function FeaturedProducts({ products, loading }: Props) {
                   </div>
                 )}
               </Link>
+
               <div className="p-4 flex-1 flex flex-col">
                 <span className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
                   {product.category?.name}
@@ -80,6 +85,7 @@ export default function FeaturedProducts({ products, loading }: Props) {
                     {product.name}
                   </h3>
                 </Link>
+
                 <div className="mt-auto flex items-center justify-between">
                   <div>
                     <p className="text-xs text-gray-400 mb-0.5">قیمت</p>
@@ -98,6 +104,7 @@ export default function FeaturedProducts({ products, loading }: Props) {
                     <ShoppingCart className="h-4 w-4" />
                   </button>
                 </div>
+
                 {product.stock === 0 && (
                   <p className="text-xs text-red-500 mt-2 text-center">
                     ناموجود
