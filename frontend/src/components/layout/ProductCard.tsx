@@ -335,7 +335,12 @@ export function ProductCard({
               }}
             >
               <ShoppingCart className="h-4 w-4 ml-1" />
-              <span className="text-xs">افزودن</span>
+              <Link
+                href={`/products/${product.slug}`}
+                className="text-xs cursor-pointer"
+              >
+                افزودن
+              </Link>
             </Button>
           )}
         </div>
