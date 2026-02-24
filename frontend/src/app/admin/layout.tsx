@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -21,6 +21,10 @@ import {
   Mail,
   Users2,
   Settings,
+  ChevronLeft,
+  Bell,
+  Search,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,7 +33,18 @@ import {
   SheetContent,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { cn } from "../../../lib/utils";
 
 export default function AdminLayout({
@@ -40,8 +55,10 @@ export default function AdminLayout({
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifications] = useState(3); // نمونه تعداد نوتیفیکیشن
 
   useEffect(() => {
     setMounted(true);
@@ -84,83 +101,170 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">در حال بارگذاری...</p>
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-20 h-20 border-4 border-purple-600 border-b-transparent rounded-full animate-spin mx-auto absolute inset-0 opacity-50" />
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 mt-4">
+            در حال بارگذاری...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 transition-colors duration-300">
-      {/* نوار بالای ادمین */}
-      <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-sm sticky top-0 z-20 border-b border-gray-200 dark:border-gray-800 transition-colors">
-        <div className="px-4">
-          <div className="flex justify-between items-center h-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300">
+      {/* نوار بالای ادمین - بهبود یافته */}
+      <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-sm sticky top-0 z-30 border-b border-gray-200/50 dark:border-gray-800/50 transition-all">
+        <div className="px-4 sm:px-6">
+          <div className="flex justify-between items-center h-16 lg:h-20">
             {/* بخش راست - دکمه همبرگری و لوگو */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {/* دکمه همبرگری برای موبایل */}
               <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="p-0 w-64">
+                <SheetContent side="right" className="p-0 w-80 sm:w-96">
                   <SheetTitle className="sr-only">منوی مدیریت</SheetTitle>
-                  <div className="h-full bg-white dark:bg-gray-900">
-                    <div className="p-4 border-b dark:border-gray-800">
+                  <div className="h-full bg-white dark:bg-gray-900 overflow-y-auto">
+                    {/* هدر موبایل */}
+                    <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-4 z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-xl font-bold bg-gradient-to-l from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                          پنل مدیریت
+                        </span>
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="lg:hidden"
+                          >
+                            <X className="h-5 w-5" />
+                          </Button>
+                        </SheetClose>
+                      </div>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-12 w-12 border-2 border-blue-600/20">
                           <AvatarImage src={getAvatarUrl()} />
-                          <AvatarFallback className="bg-blue-600 text-white">
+                          <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">
                             {getUserInitial()}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-bold dark:text-white">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-900 dark:text-white truncate">
                             {user.name}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            ادمین
+                            {user.email || "admin@example.com"}
                           </p>
+                          <Badge
+                            variant="outline"
+                            className="mt-1 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+                          >
+                            مدیر ارشد
+                          </Badge>
                         </div>
                       </div>
                     </div>
-                    <div className="p-2">
-                      {menuItems.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all group"
-                        >
-                          <item.icon className="h-5 w-5" />
-                          <span>{item.label}</span>
-                        </Link>
-                      ))}
+
+                    {/* منوی موبایل */}
+                    <div className="p-3">
+                      {menuItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setSidebarOpen(false)}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-all",
+                              isActive
+                                ? "bg-gradient-to-l from-blue-600 to-purple-600 text-white shadow-lg"
+                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                            )}
+                          >
+                            <item.icon className="h-5 w-5" />
+                            <span className="flex-1">{item.label}</span>
+                            {item.href === "/admin/messages" &&
+                              notifications > 0 && (
+                                <Badge
+                                  className={cn(
+                                    "text-xs",
+                                    isActive
+                                      ? "bg-white text-blue-600"
+                                      : "bg-red-500 text-white",
+                                  )}
+                                >
+                                  {notifications}
+                                </Badge>
+                              )}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 </SheetContent>
               </Sheet>
 
-              <span className="text-xl font-bold bg-gradient-to-l from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                پنل مدیریت
-              </span>
+              {/* لوگو */}
+              <Link href="/admin" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">N</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-l from-blue-600 to-purple-600 bg-clip-text text-transparent hidden sm:block">
+                  NoronTech
+                </span>
+              </Link>
+
+              {/* دکمه بازگشت به سایت */}
+              <Link href="/">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden md:flex items-center gap-2 text-gray-600 dark:text-gray-400"
+                >
+                  <Home className="h-4 w-4" />
+                  <span>مشاهده سایت</span>
+                </Button>
+              </Link>
             </div>
 
-            {/* بخش وسط - خوش‌آمدگویی (فقط دسکتاپ) */}
-            <div className="hidden lg:flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                خوش آمدید،
-              </span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                {user.name}
-              </span>
+            {/* بخش جستجو - دسکتاپ */}
+            <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
+              <div className="relative w-full">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="جستجو در پنل مدیریت..."
+                  className="w-full pr-10 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                />
+              </div>
             </div>
 
             {/* بخش چپ - دکمه‌ها */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* دکمه نوتیفیکیشن */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                <Bell className="h-5 w-5" />
+                {notifications > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                    {notifications}
+                  </span>
+                )}
+              </Button>
+
               {/* دکمه تغییر تم */}
               <Button
                 variant="ghost"
@@ -175,14 +279,60 @@ export default function AdminLayout({
                 )}
               </Button>
 
-              {/* دکمه خروج */}
+              {/* پروفایل کاربر - دسکتاپ */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hidden lg:flex items-center gap-2 px-2"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={getAvatarUrl()} />
+                      <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white text-xs">
+                        {getUserInitial()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.email?.slice(0, 15)}...
+                      </p>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>حساب کاربری</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => router.push("/admin/profile")}
+                  >
+                    <Users className="h-4 w-4 ml-2" />
+                    پروفایل
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/admin/settings")}
+                  >
+                    <Settings className="h-4 w-4 ml-2" />
+                    تنظیمات
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-red-600">
+                    <LogOut className="h-4 w-4 ml-2" />
+                    خروج
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* دکمه خروج - موبایل */}
               <Button
                 variant="ghost"
+                size="icon"
                 onClick={logout}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+                className="lg:hidden text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
               >
-                <LogOut className="h-4 w-4 ml-2" />
-                <span className="hidden sm:inline">خروج</span>
+                <LogOut className="h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -190,66 +340,127 @@ export default function AdminLayout({
       </nav>
 
       <div className="flex">
-        {/* سایدبار دسکتاپ */}
-        <aside className="hidden lg:block w-64 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-l border-gray-200 dark:border-gray-800 min-h-[calc(100vh-64px)] transition-colors">
-          <div className="p-4">
+        {/* سایدبار دسکتاپ - بهبود یافته */}
+        <aside className="hidden lg:block w-72 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-l border-gray-200/50 dark:border-gray-800/50 min-h-[calc(100vh-80px)] sticky top-20 transition-all">
+          <div className="p-4 h-full overflow-y-auto">
             {/* پروفایل کاربر */}
-            <div className="flex items-center gap-3 p-3 mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl">
-              <Avatar className="h-12 w-12 border-2 border-white dark:border-gray-800">
-                <AvatarImage src={getAvatarUrl()} />
-                <AvatarFallback className="bg-blue-600 text-white">
-                  {getUserInitial()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-bold dark:text-white">{user.name}</p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                  مدیر ارشد
-                </p>
+            <div className="relative mb-6 p-4 bg-gradient-to-br from-blue-600/5 to-purple-600/5 rounded-2xl border border-gray-200/50 dark:border-gray-800/50">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-16 w-16 border-3 border-white dark:border-gray-800 shadow-xl">
+                  <AvatarImage src={getAvatarUrl()} />
+                  <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white text-xl">
+                    {getUserInitial()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-900 dark:text-white truncate text-lg">
+                    {user.name}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    {user.email || "admin@norontech.ir"}
+                  </p>
+                  <Badge className="mt-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none">
+                    مدیر ارشد
+                  </Badge>
+                </div>
               </div>
             </div>
 
-            {/* منو */}
-            <ul className="space-y-1">
-              {menuItems.map((item) => (
-                <li key={item.href}>
+            {/* منوی اصلی */}
+            <div className="space-y-1">
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
                   <Link
+                    key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-xl",
-                      "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400",
-                      "transition-all group relative overflow-hidden",
+                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative overflow-hidden",
+                      isActive
+                        ? "bg-gradient-to-l from-blue-600 to-purple-600 text-white shadow-lg"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
                     )}
                   >
                     {/* خط کناری */}
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-0 bg-blue-600 rounded-full group-hover:h-8 transition-all duration-300" />
+                    <div
+                      className={cn(
+                        "absolute right-0 top-1/2 -translate-y-1/2 w-1 rounded-full transition-all duration-300",
+                        isActive
+                          ? "h-8 bg-white"
+                          : "h-0 group-hover:h-6 bg-blue-600",
+                      )}
+                    />
 
-                    <item.icon className="h-5 w-5 relative z-10" />
-                    <span className="relative z-10">{item.label}</span>
+                    <item.icon
+                      className={cn(
+                        "h-5 w-5 relative z-10",
+                        isActive
+                          ? "text-white"
+                          : "text-gray-500 dark:text-gray-400",
+                      )}
+                    />
+                    <span className="relative z-10 flex-1">{item.label}</span>
 
                     {/* آماری */}
-                    {item.href === "/admin/messages" && (
-                      <span className="mr-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                        ۳
-                      </span>
+                    {item.href === "/admin/messages" && notifications > 0 && (
+                      <Badge
+                        className={cn(
+                          "text-xs relative z-10",
+                          isActive
+                            ? "bg-white text-blue-600"
+                            : "bg-red-500 text-white",
+                        )}
+                      >
+                        {notifications}
+                      </Badge>
                     )}
                   </Link>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
 
-            {/* نسخه */}
-            <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-800 text-center">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                نسخه ۱.۰.۰
-              </p>
+            {/* فوتر سایدبار */}
+            <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-800">
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  نسخه ۲.۰.۰
+                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 dark:text-gray-400">
+                    آخرین به‌روزرسانی
+                  </span>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">
+                    بهمن ۱۴۰۴
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
 
-        {/* محتوای اصلی */}
-        <main className="flex-1 p-6 transition-colors">
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 transition-colors">
+        {/* محتوای اصلی - بهبود یافته */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 transition-colors">
+          {/* مسیر فعلی (Breadcrumb) */}
+          <div className="flex items-center gap-2 mb-4 text-sm">
+            <Link
+              href="/admin"
+              className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              داشبورد
+            </Link>
+            {pathname !== "/admin" && (
+              <>
+                <ChevronLeft className="h-4 w-4 text-gray-400" />
+                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                  {menuItems.find((item) => item.href === pathname)?.label ||
+                    "صفحه"}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* کانتینر محتوا */}
+          <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-800/50 p-4 sm:p-6 lg:p-8 transition-all">
             {children}
           </div>
         </main>
