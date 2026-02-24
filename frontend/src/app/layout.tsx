@@ -30,17 +30,17 @@ export default function RootLayout({
       <body
         className={`${vazirmatn.className} h-full bg-white dark:bg-gray-950 transition-colors duration-300`}
       >
-        <Navbar/>
         <Providers>
           <AuthProvider>
             <CartProvider>
               <div className="min-h-full flex flex-col">
+                <Navbar />
                 {children}
+                <Footer />
               </div>
             </CartProvider>
           </AuthProvider>
         </Providers>
-        <Footer/>
       </body>
     </html>
   );
